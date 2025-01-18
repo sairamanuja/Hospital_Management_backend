@@ -7,7 +7,7 @@ export const userMiddleware = async (req,res,next) =>{
    if(!token){
    return res.json("please check the token in headers")
    }
-   const jwtToken = token.split(" ")[1];
+   const jwtToken = token.split(" ")[2];
    console.log(jwtToken);
    
 
@@ -18,6 +18,7 @@ export const userMiddleware = async (req,res,next) =>{
     console.log(JWT_SECRET)
     if(decodedToken){
       req.user = { id: decodedToken.id };
+      req.hospital = { id: decodedToken.hospital };
         next() 
     }
     else{

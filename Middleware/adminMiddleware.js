@@ -18,6 +18,7 @@ export const adminMiddleware = async (req,res,next) =>{
     console.log(JWT_SECRET)
     if(decodedToken){
       req.admin = { id: decodedToken.id };
+      req.hospital = { id: decodedToken.hospital };
         next() 
     }
     else{

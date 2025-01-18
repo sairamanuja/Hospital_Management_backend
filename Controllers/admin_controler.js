@@ -11,6 +11,7 @@ export const signup =async (req,res)=>{
         return res.status(400).json({ message:"enter all the details"})
 
     }
+    const hospitalId = req.hospital.id;
     try{
           const admin = await  AdminModel.findOne({email})
           if(admin){
@@ -23,7 +24,8 @@ export const signup =async (req,res)=>{
             password:hashedPassword,
             name,
             address,
-            phone
+            phone,
+            hospital:hospitalId
           })
           if(newadmin){
             return res.status(200).json({message:"signup done sucessfully"})
@@ -37,6 +39,7 @@ export const signup =async (req,res)=>{
 }
 
 export const login = async (req, res) => {
+    const hospitalId = req.hospital.id;
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ message: "enter email and password" });
@@ -51,7 +54,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: "invalid password" });
         }
         const JWT_SECRET = "manish12"
-        const token = jwt.sign({ id: admin._id }, JWT_SECRET);
+        const token = jwt.sign({ id: admin._id,hospital:hospitalId }, JWT_SECRET);
         if(token){
             return res.status(200).json({ message: "admin logged in successfully", token });
         }
@@ -82,7 +85,8 @@ export const AddDoctor = async (req,res)=>{
             speciality,
             education,
             address,
-            phone
+            phone,
+            updatedBy:adminId
         })
         if(Doctor){
             return res.status(200).json({message:"doctor created sucessfully"})

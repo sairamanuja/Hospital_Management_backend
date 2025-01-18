@@ -7,6 +7,6 @@ import { selectHospital, createHospital } from '../Controllers/hospital_controle
 
 router.post("/selectHospital",selectHospital)
 router.post("/createHospital",createHospital)
-router.get("/allHospital",hospitalMiddleware,AllHospital)
+router.get("/allHospital",AllHospital)
 
 export default router;

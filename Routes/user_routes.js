@@ -8,9 +8,9 @@ import { userMiddleware } from '../Middleware/usermiddeleware.js';
 import { hospitalMiddleware } from '../Middleware/hospitalMiddleware.js';
 
 userRouter.post("/signup",signup)
-userRouter.post("/login",login)
-userRouter.post("/addAppointment",hospitalMiddleware,userMiddleware,bookAppointment)
-userRouter.get("/getAppointments",hospitalMiddleware,userMiddleware,GetAppointments)
+userRouter.post("/login",hospitalMiddleware,login)
+userRouter.post("/addAppointment",userMiddleware,bookAppointment)
+userRouter.get("/getAppointments",userMiddleware,GetAppointments)
 
 export default userRouter;
 

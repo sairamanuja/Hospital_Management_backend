@@ -1,4 +1,5 @@
 import { AppointmentModel_doctor } from "../Models/appointment_doctor.js";
+import { AppointmentModel_user } from "../Models/appointment_user.js";
 import { UserModel } from "../Models/user_model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -39,6 +40,7 @@ export const signup =async (req,res)=>{
  
  export const login = async (req, res) => {
      const { email, password } = req.body;
+     const hospitalId = req.hospital.id;
      if (!email || !password) {
          return res.status(400).json({ message: "enter email and password" });
      }
@@ -52,7 +54,7 @@ export const signup =async (req,res)=>{
              return res.status(401).json({ message: "invalid password" });
          }
          const JWT_SECRET = "manish12"
-         const token = jwt.sign({ id: user._id }, JWT_SECRET);
+         const token = jwt.sign({ id: user._id,hospital:hospitalId}, JWT_SECRET);
          if(token){
              return res.status(200).json({ message: "user logged in successfully", token });
          }
@@ -92,23 +94,35 @@ export const bookAppointment = async (req, res) => {
     try {
       const {  date, startTime, endTime, doctorId } = req.body;
       const patientId = req.user.id;
-  
+      const hospitalId = req.hospital.id;
+console.log(hospitalId)  
       if (!patientId || !date || !startTime || !endTime || !doctorId) {
         return res.status(400).json({ message: "All fields are required." });
       }
   
       const dayOfWeek = new Date(date).toLocaleString("en-us", { weekday: "long" });
-  
-      const newAppointment = new AppointmentModel_doctor({
+       
+      const bookSlot = await AppointmentModel_doctor.findOneAndUpdate({
+        doctor:doctorId,
+        hospital:hospitalId,
+        "availability.day":dayOfWeek,
+        "availability.slots.startTime":startTime,
+        "availability.slots.endTime":endTime,
+      },{$set:{
+        "availability.slots.isBooked":true
+      }})
+      console.log(bookSlot)
+      const newAppointment = new AppointmentModel_user({
         doctor: doctorId,
+        hospital: hospitalId,
         user: patientId,
         availability: [
           {
             day: dayOfWeek,
             slots: [
               {
-                startTime,
-                endTime,
+                startTime:startTime,
+                endTime:endTime,
                 isBooked: true,
               },
             ],
@@ -116,10 +130,8 @@ export const bookAppointment = async (req, res) => {
         ],
       });
   
-      await newAppointment.save();
+        await newAppointment.save();
   
-      slot.isBooked = true;
-      await doctor.save();
   
       return res.status(201).json({
         message: "Appointment booked successfully.",
